@@ -1,0 +1,3 @@
+/* 'name' => 'Admin',
+    'email' => 'admin@coffeehaven.com',
+    'password' => bcrypt('password123'), */
