@@ -1,120 +1,144 @@
 @extends('layouts.app')
-
 @section('content')
 
-<div style="display:flex; justify-content:space-between; align-items:center;">
-    <h2>My Bookings</h2>
+<!-- Header -->
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+    <div>
+        <h2 style="margin-bottom:3px;">My Bookings</h2>
+        <p style="color:#999; font-size:14px;">Welcome back, {{ auth()->user()->name }}! ☕</p>
+    </div>
     <div style="display:flex; gap:10px;">
         <a href="/booking/details">
-            <button>+ New Booking</button>
+            <button style="background:linear-gradient(135deg,#6f4e37,#c68e5b); padding:10px 20px;">
+                + New Booking
+            </button>
         </a>
         <form method="POST" action="/logout">
             @csrf
-            <button type="submit" style="background:#4a2c2a;">Logout</button>
+            <button type="submit" style="background:#4a2c2a; padding:10px 20px;">Logout</button>
         </form>
     </div>
 </div>
 
-<br>
-
-<!-- Stats Card -->
-<div class="card" style="display:flex; gap:30px; align-items:center;">
-    <div style="text-align:center;">
-        <div style="font-size:36px; font-weight:bold; color:#6f4e37;">{{ $bookings->count() }}</div>
-        <div style="color:#999; font-size:14px;">My Bookings</div>
+<!-- Stats -->
+<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:15px; margin-bottom:30px;">
+    <div style="
+        background:linear-gradient(135deg,#6f4e37,#c68e5b);
+        padding:20px;
+        border-radius:15px;
+        text-align:center;
+        color:white;
+        box-shadow:0 5px 15px rgba(111,78,55,0.3);
+    ">
+        <div style="font-size:40px; font-weight:800;">{{ $bookings->count() }}</div>
+        <div style="font-size:13px; opacity:0.9; margin-top:5px;">📅 Total Bookings</div>
     </div>
-    <div style="text-align:center;">
-        <div style="font-size:36px; font-weight:bold; color:#6f4e37;">
+    <div style="
+        background:linear-gradient(135deg,#4a7c4e,#6dbf6d);
+        padding:20px;
+        border-radius:15px;
+        text-align:center;
+        color:white;
+        box-shadow:0 5px 15px rgba(74,124,78,0.3);
+    ">
+        <div style="font-size:40px; font-weight:800;">
             {{ $bookings->where('booking_date', '>=', \Carbon\Carbon::today()->toDateString())->count() }}
         </div>
-        <div style="color:#999; font-size:14px;">Upcoming</div>
+        <div style="font-size:13px; opacity:0.9; margin-top:5px;">✅ Upcoming</div>
     </div>
-    <div style="text-align:center;">
-        <div style="font-size:36px; font-weight:bold; color:#6f4e37;">
+    <div style="
+        background:linear-gradient(135deg,#555,#888);
+        padding:20px;
+        border-radius:15px;
+        text-align:center;
+        color:white;
+        box-shadow:0 5px 15px rgba(0,0,0,0.2);
+    ">
+        <div style="font-size:40px; font-weight:800;">
             {{ $bookings->where('booking_date', '<', \Carbon\Carbon::today()->toDateString())->count() }}
         </div>
-        <div style="color:#999; font-size:14px;">Past</div>
+        <div style="font-size:13px; opacity:0.9; margin-top:5px;">🕐 Past</div>
     </div>
 </div>
 
-<br>
-
-<!-- FullCalendar -->
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
 
-<h3 style="color:#6f4e37; margin-bottom:15px;">My Booking Calendar</h3>
-<div id="my-calendar" style="margin-bottom:30px;"></div>
+<!-- Calendar -->
+<div style="background:#fffaf5; border-radius:15px; padding:20px; margin-bottom:30px; border:1px solid #f0e0d0;">
+    <h3 style="color:#6f4e37; margin-bottom:15px;">📅 My Booking Calendar</h3>
+    <div id="my-calendar"></div>
+</div>
 
-<br>
+<!-- Table -->
+<div style="background:white; border-radius:15px; padding:20px; border:1px solid #f0e0d0;">
+    <h3 style="color:#6f4e37; margin-bottom:15px;">📋 Booking Details</h3>
 
-<!-- Bookings Table -->
-<h3 style="color:#6f4e37; margin-bottom:15px;">Booking Details</h3>
-
-@if($bookings->isEmpty())
-    <div class="card" style="text-align:center;">
-        <p>You have no bookings yet.</p>
-        <br>
-        <a href="/booking/details">
-            <button>Make a Reservation</button>
-        </a>
-    </div>
-@else
-<table>
-    <thead>
-        <tr>
-            <th>Booking ID</th>
-            <th>Room</th>
-            <th>Date</th>
-            <th>Persons</th>
-            <th>Status</th>
-            <th>File</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($bookings as $booking)
-        <tr>
-            <td><strong>{{ $booking->booking_id }}</strong></td>
-            <td>{{ $booking->room->name ?? $booking->event_name }}</td>
-            <td>{{ \Carbon\Carbon::parse($booking->booking_date)->format('F d, Y') }}</td>
-            <td>{{ $booking->persons }}</td>
-            <td>
-                @if($booking->booking_date >= \Carbon\Carbon::today()->toDateString())
-                    <span style="
-                        background:#e6f4ea;
-                        color:#2e7d32;
-                        padding:4px 10px;
-                        border-radius:20px;
-                        font-size:13px;
-                        font-weight:600;
-                    ">Upcoming</span>
-                @else
-                    <span style="
-                        background:#f5f5f5;
-                        color:#999;
-                        padding:4px 10px;
-                        border-radius:20px;
-                        font-size:13px;
-                        font-weight:600;
-                    ">Past</span>
-                @endif
-            </td>
-            <td>
-                @if($booking->confirmation_file)
-                    <a href="{{ asset('storage/'.$booking->confirmation_file) }}" target="_blank">View</a>
-                @else
-                    <span style="color:#999;">None</span>
-                @endif
-            </td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
-@endif
+    @if($bookings->isEmpty())
+        <div style="text-align:center; padding:40px; color:#999;">
+            <div style="font-size:50px; margin-bottom:15px;">☕</div>
+            <p style="margin-bottom:15px;">No bookings yet. Start your coffee experience!</p>
+            <a href="/booking/details">
+                <button style="background:linear-gradient(135deg,#6f4e37,#c68e5b);">Make a Reservation</button>
+            </a>
+        </div>
+    @else
+    <table>
+        <thead>
+            <tr>
+                <th>Booking ID</th>
+                <th>Room</th>
+                <th>Date</th>
+                <th>Persons</th>
+                <th>Status</th>
+                <th>File</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($bookings as $booking)
+            <tr>
+                <td><strong style="color:#6f4e37;">{{ $booking->booking_id }}</strong></td>
+                <td>
+                    <span style="background:#fffaf5; padding:4px 10px; border-radius:20px; font-size:13px; border:1px solid #f0e0d0;">
+                        {{ $booking->room->name ?? $booking->event_name }}
+                    </span>
+                </td>
+                <td>{{ \Carbon\Carbon::parse($booking->booking_date)->format('F d, Y') }}</td>
+                <td>
+                    <span style="background:#e8f4fd; color:#1565c0; padding:4px 10px; border-radius:20px; font-size:13px;">
+                        👥 {{ $booking->persons }}
+                    </span>
+                </td>
+                <td>
+                    @if($booking->booking_date >= \Carbon\Carbon::today()->toDateString())
+                        <span style="background:#e6f4ea; color:#2e7d32; padding:4px 12px; border-radius:20px; font-size:13px; font-weight:600;">
+                            ✅ Upcoming
+                        </span>
+                    @else
+                        <span style="background:#f5f5f5; color:#999; padding:4px 12px; border-radius:20px; font-size:13px; font-weight:600;">
+                            🕐 Past
+                        </span>
+                    @endif
+                </td>
+                <td>
+                    @if($booking->confirmation_file)
+                        <a href="{{ asset('storage/'.$booking->confirmation_file) }}" target="_blank"
+                           style="color:#6f4e37; font-weight:600; text-decoration:none;">
+                            📄 View
+                        </a>
+                    @else
+                        <span style="color:#ccc;">None</span>
+                    @endif
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+    @endif
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-
     const myBookings = @json($calendarEvents);
 
     const calendar = new FullCalendar.Calendar(document.getElementById('my-calendar'), {
@@ -135,20 +159,10 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <style>
-.fc-toolbar-title {
-    color:#6f4e37 !important;
-}
-.fc-button-primary {
-    background:#6f4e37 !important;
-    border-color:#6f4e37 !important;
-}
-.fc-button-primary:hover {
-    background:#4a2c2a !important;
-    border-color:#4a2c2a !important;
-}
-.fc-event {
-    cursor: pointer;
-}
+.fc-toolbar-title { color:#6f4e37 !important; font-weight:700 !important; }
+.fc-button-primary { background:linear-gradient(135deg,#6f4e37,#c68e5b) !important; border:none !important; }
+.fc-button-primary:hover { opacity:0.9 !important; }
+.fc-event { border-radius:5px !important; font-size:12px !important; }
 </style>
 
 @endsection

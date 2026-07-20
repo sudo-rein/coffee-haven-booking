@@ -1,47 +1,258 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Coffee Haven - Login</title>
+    <style>
+        * {
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Segoe UI', sans-serif;
+        }
+
+        body {
+            min-height:100vh;
+            background:url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1920');
+            background-size:cover;
+            background-position:center;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+
+        body::before {
+            content:'';
+            position:fixed;
+            top:0; left:0;
+            width:100%; height:100%;
+            background:linear-gradient(135deg, rgba(30,15,5,0.85) 0%, rgba(74,44,42,0.75) 100%);
+            z-index:0;
+        }
+
+        .box {
+            position:relative;
+            z-index:1;
+            background:rgba(255,255,255,0.97);
+            padding:45px 40px;
+            border-radius:20px;
+            box-shadow:0 20px 60px rgba(0,0,0,0.4);
+            width:420px;
+        }
+
+        .logo {
+            text-align:center;
+            font-size:45px;
+            margin-bottom:10px;
+            animation:float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform:translateY(0); }
+            50%       { transform:translateY(-8px); }
+        }
+
+        h2 {
+            color:#6f4e37;
+            text-align:center;
+            font-size:26px;
+            font-weight:800;
+            margin-bottom:5px;
+        }
+
+        .subtitle {
+            text-align:center;
+            color:#999;
+            font-size:13px;
+            margin-bottom:30px;
+        }
+
+        label {
+            color:#4a2c2a;
+            font-weight:600;
+            font-size:13px;
+            display:block;
+            margin-bottom:5px;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width:100%;
+            padding:13px 15px;
+            margin-bottom:18px;
+            border:2px solid #f0e0d0;
+            border-radius:10px;
+            font-size:14px;
+            transition:border 0.3s;
+            background:#fffaf5;
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline:none;
+            border-color:#c68e5b;
+            background:white;
+        }
+
+        .remember {
+            display:flex;
+            align-items:center;
+            gap:8px;
+            margin-bottom:20px;
+        }
+
+        .remember input {
+            width:16px;
+            height:16px;
+            margin:0;
+            padding:0;
+            accent-color:#6f4e37;
+        }
+
+        .remember label {
+            font-weight:normal;
+            font-size:13px;
+            color:#666;
+            margin:0;
+        }
+
+        button[type="submit"] {
+            width:100%;
+            padding:14px;
+            background:linear-gradient(135deg, #6f4e37, #c68e5b);
+            color:white;
+            border:none;
+            border-radius:10px;
+            font-size:16px;
+            font-weight:700;
+            cursor:pointer;
+            transition:all 0.3s;
+            box-shadow:0 5px 15px rgba(111,78,55,0.4);
+        }
+
+        button[type="submit"]:hover {
+            transform:translateY(-2px);
+            box-shadow:0 8px 20px rgba(111,78,55,0.5);
+        }
+
+        .error {
+            color:#c0392b;
+            font-size:12px;
+            margin-top:-12px;
+            margin-bottom:12px;
+        }
+
+        .divider {
+            text-align:center;
+            color:#ccc;
+            margin:20px 0;
+            font-size:13px;
+            position:relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content:'';
+            position:absolute;
+            top:50%;
+            width:40%;
+            height:1px;
+            background:#eee;
+        }
+
+        .divider::before { left:0; }
+        .divider::after  { right:0; }
+
+        .register-link {
+            text-align:center;
+            font-size:14px;
+            color:#666;
+        }
+
+        .register-link a {
+            color:#6f4e37;
+            font-weight:700;
+            text-decoration:none;
+        }
+
+        .register-link a:hover {
+            text-decoration:underline;
+        }
+
+        .back-link {
+            text-align:center;
+            margin-top:15px;
+        }
+
+        .back-link a {
+            color:#999;
+            font-size:13px;
+            text-decoration:none;
+        }
+
+        .back-link a:hover {
+            color:#6f4e37;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <div class="logo">☕</div>
+    <h2>Coffee Haven</h2>
+    <p class="subtitle">Login to your account</p>
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        <label>Email Address</label>
+        <input
+            type="email"
+            name="email"
+            value="{{ old('email') }}"
+            required
+            autofocus
+            autocomplete="email"
+            placeholder="Enter your email"
+        >
+        @error('email')
+            <div class="error">{{ $message }}</div>
+        @enderror
+
+        <label>Password</label>
+        <input
+            type="password"
+            name="password"
+            required
+            autocomplete="current-password"
+            placeholder="Enter your password"
+        >
+        @error('password')
+            <div class="error">{{ $message }}</div>
+        @enderror
+
+        <div class="remember">
+            <input
+                type="checkbox"
+                name="remember"
+                id="remember"
+                {{ old('remember') ? 'checked' : '' }}
+            >
+            <label for="remember">Remember Me</label>
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
+        <button type="submit">Login ☕</button>
     </form>
-</x-guest-layout>
+
+    <div class="divider">or</div>
+
+    <div class="register-link">
+        Don't have an account? <a href="/register">Register here</a>
+    </div>
+
+    <div class="back-link">
+        <a href="/">← Back to Home</a>
+    </div>
+</div>
+
+</body>
+</html>
