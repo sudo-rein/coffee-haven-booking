@@ -65,6 +65,8 @@ class BookingController extends Controller
         return redirect('/booking/confirmation');
     }
 
+
+    
 public function myBookings()
 {
     $bookings = Booking::with('room')
@@ -81,8 +83,11 @@ public function myBookings()
         ];
     });
 
-    return view('booking.my-bookings', compact('bookings', 'calendarEvents'));
+    $rooms = \App\Models\Room::withCount('bookings')->get();
+
+    return view('booking.my-bookings', compact('bookings', 'calendarEvents', 'rooms'));
 }
+
 
     public function confirmation()
     {
